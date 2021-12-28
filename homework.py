@@ -69,9 +69,7 @@ def check_response(response):
     if type(homeworks) is not list:
         logger.error("Некоректный формат списка")
         raise Exception("Некоректный формат списка")
-    if not homeworks:
-        logger.debug("Список работ пуст.")
-        raise Exception("Список работ пуст.")
+
     return homeworks
 
 
