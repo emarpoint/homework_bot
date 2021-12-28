@@ -37,7 +37,7 @@ HOMEWORK_STATUSES = {
 
 
 def send_message(message, bot):
-    """ Отправляет сообщение в Telegram чат"""
+    """Отправляет сообщение в Telegram чат."""
     return bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
 
 
@@ -61,8 +61,8 @@ def get_api_answer(current_timestamp):
 
 
 def check_response(response):
+    """Проверяет ответ API на корректность."""
     homeworks = response['homeworks']
-
     if homeworks is None:
         logger.error("Нет домашней работы")
         raise Exception("Нет домашней работы")
