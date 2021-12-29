@@ -1,5 +1,5 @@
-import simplejson
 import logging
+import json as simplejson
 
 from dotenv import load_dotenv
 
