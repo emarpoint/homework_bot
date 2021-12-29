@@ -96,7 +96,7 @@ class Error(Exception):
 
 class HomeworkNameError(Error):
     """HomeworkNameError exceptions."""
-    
+
     pass
 
 
