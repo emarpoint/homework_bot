@@ -89,16 +89,22 @@ def check_response(response):
 
 
 class Error(Exception):
-    """Base class for other exceptions"""
+    """Base class for other exceptions."""
+
     pass
+
 
 class HomeworkNameError(Error):
-    """HomeworkNameError exceptions"""
+    """HomeworkNameError exceptions."""
+    
     pass
 
+
 class HomeworkStatusError(Error):
-    """HomeworkStatusError exceptions"""
+    """HomeworkStatusError exceptions."""
+
     pass
+
 
 def parse_status(homework):
     """Достаем статус работы."""
@@ -110,7 +116,7 @@ def parse_status(homework):
         if homework_status is None:
             raise HomeworkStatusError("Нет вердикта")
         logging.info(f'Вердикт {homework_status}')
-        return (f'Изменился статус проверки работы "{homework_name}".' 
+        return (f'Изменился статус проверки работы "{homework_name}".'
                 f'{homework_status}')
     except Exception:
         logging.error(f'Ошибка с ключем в словаре {HOMEWORK_STATUSES}')
