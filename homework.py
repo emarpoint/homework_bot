@@ -10,7 +10,6 @@ import telegram
 import time
 from requests.exceptions import (
     ConnectionError, RequestException, TooManyRedirects)
-from pprint import pprint
 from telegram import TelegramError
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -35,6 +34,7 @@ HOMEWORK_STATUSES = {
     'rejected': 'Работа проверена: у ревьюера есть замечания.'
 }
 
+
 def send_message(message, bot):
     """Отправляет сообщение в Telegram чат о статусе проверенной работы."""
     logging.info(f'Сообщение: {message}')
@@ -43,6 +43,7 @@ def send_message(message, bot):
         bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
     except TelegramError:
         invalid_chatid.append(TELEGRAM_CHAT_ID)
+
 
 def get_api_answer(current_timestamp):
     """Делает запрос к единственному эндпоинту API-сервиса."""
@@ -65,11 +66,12 @@ def get_api_answer(current_timestamp):
                 f'Ответ не преобразовался в json : {homework_status.json()}')
     except ConnectionError:
         logging.error('Ошибка сервера')
-    except RequestException as e: 
+    except RequestException as e:
         raise SystemExit(e)
     except TooManyRedirects:
         logging.error('Превышено количество перенаправлений')
         return {}
+
 
 def check_response(response):
     """Проверяет ответ API на корректность."""
@@ -87,12 +89,15 @@ def check_response(response):
 
 
 class Error(Exception):
+    """Base class for other exceptions"""
     pass
 
 class HomeworkNameError(Error):
+    """HomeworkNameError exceptions"""
     pass
 
 class HomeworkStatusError(Error):
+    """HomeworkStatusError exceptions"""
     pass
 
 def parse_status(homework):
@@ -100,12 +105,13 @@ def parse_status(homework):
     homework_name = homework.get('homework_name')
     homework_status = HOMEWORK_STATUSES[homework.get('status')]
     try:
-        if homework_name is None :
-            raise HomeworkNameError ("Произошла ошибка")
+        if homework_name is None:
+            raise HomeworkNameError("Произошла ошибка")
         if homework_status is None:
             raise HomeworkStatusError("Нет вердикта")
         logging.info(f'Вердикт {homework_status}')
-        return f'Изменился статус проверки работы "{homework_name}". {homework_status}'
+        return (f'Изменился статус проверки работы "{homework_name}".' 
+                f'{homework_status}')
     except Exception:
         logging.error(f'Ошибка с ключем в словаре {HOMEWORK_STATUSES}')
 
@@ -132,7 +138,7 @@ def main():
     if not check_tokens():
         message = 'Произошла ошибка в check_tokens'
         send_message(message, bot)
-    while True:  
+    while True:
         try:
             response = get_api_answer(current_timestamp)
             if check_response(response):
@@ -143,7 +149,6 @@ def main():
             current_timestamp = response.get('current_date',
                                              current_timestamp)
             time.sleep(RETRY_TIME)
-        
         except Exception as error:
             logging.exception(f'Бот столкнулся с ошибкой: {error}')
             message = f'Произошла ошибка программы: {error}'
