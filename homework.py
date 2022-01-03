@@ -11,7 +11,8 @@ import time
 from requests.exceptions import (ConnectionError,
                                  RequestException, TooManyRedirects)
 from telegram import TelegramError
-from CustomError import HomeworkNameError, HomeworkStatusError, TypeHomeworkError, ListHomeworkEmptyError
+from CustomError import (HomeworkNameError, HomeworkStatusError,
+                         TypeHomeworkError, ListHomeworkEmptyError)
 load_dotenv()
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -74,7 +75,6 @@ def get_api_answer(current_timestamp):
 
 def check_response(response):
     """Проверяет ответ API на корректность."""
-
     homework = response['homeworks']
     key = 'homeworks'
     if key in homework is None:
