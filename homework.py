@@ -12,7 +12,8 @@ from requests.exceptions import (ConnectionError,
                                  RequestException, TooManyRedirects)
 from telegram import TelegramError
 from CustomError import (HomeworkNameError, HomeworkStatusError,
-TypeHomeworkError, ListHomeworkEmptyError, HomeworkVerdictError )
+                         TypeHomeworkError, ListHomeworkEmptyError, 
+                         HomeworkVerdictError)
 load_dotenv()
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -92,6 +93,7 @@ def check_response(response):
         logger.error("Список работ пуст.")
         return {}
 
+
 def parse_status(homework):
     """Достаем статус работы."""
     try:
@@ -115,7 +117,6 @@ def parse_status(homework):
     else:
         return (f'Изменился статус проверки работы "{homework_name}".'
                 f'{verdict}')
-
 
 
 def check_tokens():
