@@ -14,3 +14,15 @@ class HomeworkStatusError(Error):
     """HomeworkStatusError exceptions."""
 
     pass
+
+
+class TypeHomeworkError(Error):
+    """TypeHomeworkError exceptions."""
+
+    pass
+
+
+class ListHomeworkEmptyError(Error):
+    """ListHomeworkEmptyError exceptions."""
+
+    pass
