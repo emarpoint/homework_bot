@@ -12,7 +12,7 @@ from requests.exceptions import (ConnectionError,
                                  RequestException, TooManyRedirects)
 from telegram import TelegramError
 from CustomError import (HomeworkNameError, HomeworkStatusError,
-                         TypeHomeworkError, ListHomeworkEmptyError, 
+                         TypeHomeworkError, ListHomeworkEmptyError,
                          HomeworkVerdictError)
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -98,12 +98,15 @@ def parse_status(homework):
     """Достаем статус работы."""
     try:
         homework_name = homework['homework_name']
+        print (homework_name)
         homework_status = homework['status']
         verdict = HOMEWORK_STATUSES[homework_status]
         key = 'homework_name'
         key_st = 'status'
         if not key_st or len(key_st) == 0:
-            raise HomeworkStatusError("Ошибка с ключем в словаре!")
+            raise HomeworkStatusError(f"Ошибка с ключем {key_st} в словаре!")
+        if not key or len(key) == 0 :
+            raise HomeworkStatusError(f"Ошибка с ключем {key} в словаре!")
         if homework_name is None:
             raise HomeworkNameError("Нет названия домашней работы!")
         if verdict is None:
