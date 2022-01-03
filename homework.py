@@ -76,21 +76,17 @@ def get_api_answer(current_timestamp):
 
 def check_response(response):
     """Проверяет ответ API на корректность."""
-    try:
-        homework = response['homeworks']
-        key = 'homeworks'
-        if key in homework is None:
-            raise KeyError("Ключа homeworks нет в словаре!")
-        if type(homework) is not list:
-            raise TypeHomeworkError("Некоректный формат списка!")
-        if not homework:
-            raise ListHomeworkEmptyError("Список работ пуст!")
-    except KeyError:
+    homework = response['homeworks']
+    key = 'homeworks'
+    if key in homework is None:
         logger.error("Ключа homeworks нет в словаре.")
-    except TypeHomeworkError:
+        raise KeyError("Ключа homeworks нет в словаре!")
+    if type(homework) is not list:
         logger.error("Некоректный формат списка.")
-    except ListHomeworkEmptyError:
+        raise TypeHomeworkError("Некоректный формат списка!")
+    if not homework:
         logger.error("Список работ пуст.")
+        raise ListHomeworkEmptyError("Список работ пуст!")
     else:
         return homework
 
