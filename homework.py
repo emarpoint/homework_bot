@@ -12,7 +12,8 @@ from requests.exceptions import (ConnectionError,
                                  RequestException, TooManyRedirects)
 from telegram import TelegramError
 from CustomError import (HomeworkNameError, HomeworkStatusError,
-                         TypeHomeworkError, ListHomeworkEmptyError)
+                         TypeHomeworkError, ListHomeworkEmptyError,
+                         HomeworkVerdictError)
 load_dotenv()
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -25,7 +26,7 @@ PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
-RETRY_TIME = 600
+RETRY_TIME = 6
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 PAYLOAD = {'from_date': 0}
@@ -75,37 +76,45 @@ def get_api_answer(current_timestamp):
 
 def check_response(response):
     """Проверяет ответ API на корректность."""
-    homework = response['homeworks']
-    key = 'homeworks'
-    if key in homework is None:
+    try:
+        homework = response['homeworks']
+        key = 'homeworks'
+        if key in homework is None:
+            raise KeyError("Ключа homeworks нет в словаре!")
+        if type(homework) is not list:
+            raise TypeHomeworkError("Некоректный формат списка!")
+        if not homework:
+            raise ListHomeworkEmptyError("Список работ пуст!")
+    except KeyError:
         logger.error("Ключа homeworks нет в словаре.")
-        raise KeyError("Ключа homeworks нет в словаре!")
-    if type(homework) is not list:
+    except TypeHomeworkError:
         logger.error("Некоректный формат списка.")
-        raise TypeHomeworkError("Некоректный формат списка!")
-    if not homework:
+    except ListHomeworkEmptyError:
         logger.error("Список работ пуст.")
-        raise ListHomeworkEmptyError("Список работ пуст!")
     else:
         return homework
 
 
 def parse_status(homework):
     """Достаем статус работы."""
-    homework_name = homework['homework_name']
-    homework_status = homework['status']
-    verdict = HOMEWORK_STATUSES[homework_status]
-    key = 'homework_name'
-    key_st = 'status'
-    if key_st in homework_status is None or len(key_st) == 0:
+    try:
+        homework_name = homework['homework_name']
+        homework_status = homework['status']
+        verdict = HOMEWORK_STATUSES[homework_status]
+        key = 'homework_name'
+        key_st = 'status'
+        if key_st in homework_status is None or len(key_st) == 0:
+            raise HomeworkStatusError("Ошибка с ключем в словаре!")
+        if key in homework_name is None:
+            raise HomeworkNameError("Произошла ошибка!")
+        if verdict is None:
+            raise HomeworkVerdictError("Нет вердикта!")
+    except HomeworkStatusError:
         logging.error(f'Ошибка с ключем в словаре {HOMEWORK_STATUSES}')
-        raise HomeworkStatusError("Ошибка с ключем в словаре!")
-    if key in homework_name is None:
+    except HomeworkNameError:
         logging.error("Произошла ошибка.")
-        raise HomeworkNameError("Произошла ошибка!")
-    if verdict is None:
+    except HomeworkVerdictError:
         logging.info(f'Вердикт {verdict}')
-        raise HomeworkStatusError("Нет вердикта!")
     else:
         return (f'Изменился статус проверки работы "{homework_name}".'
                 f'{verdict}')

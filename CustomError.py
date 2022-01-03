@@ -16,6 +16,12 @@ class HomeworkStatusError(Error):
     pass
 
 
+class HomeworkVerdictError(Error):
+    """HomeworkVerdictError exceptions."""
+
+    pass
+
+
 class TypeHomeworkError(Error):
     """TypeHomeworkError exceptions."""
 
