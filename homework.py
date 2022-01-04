@@ -2,7 +2,6 @@ import logging
 import json as simplejson
 
 from dotenv import load_dotenv
-from pprint import pprint
 
 import os
 from http import HTTPStatus
@@ -74,8 +73,9 @@ def get_api_answer(current_timestamp):
         logging.error('Превышено количество перенаправлений')
         return {}
 
+
 def check_response(response):
-    # У меня уже закончились идеи, перечитал кучу материала, 
+    # У меня уже закончились идеи, перечитал кучу материала,
     # если есть что-то именно по данному вопросу пришли пожалуйста.
     """Проверяет ответ API на корректность."""
     try:
@@ -86,8 +86,7 @@ def check_response(response):
     except TypeHomeworkError:
         logger.error("Некоректный формат списка.")
     except ListHomeworkEmptyError:
-        logger.error("Список работ пуст.") 
-     
+        logger.error("Список работ пуст.")
     if key not in response:
         raise KeyError("Ключа homeworks нет в словаре!")
     if type(homework) is not list:
@@ -95,7 +94,7 @@ def check_response(response):
     if not homework:
         raise ListHomeworkEmptyError("Список работ пуст!")
     else:
-        return homework   
+        return homework
 
 
 def parse_status(homework):
