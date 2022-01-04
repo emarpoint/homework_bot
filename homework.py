@@ -2,6 +2,7 @@ import logging
 import json as simplejson
 
 from dotenv import load_dotenv
+from pprint import pprint
 
 import os
 from http import HTTPStatus
@@ -26,7 +27,7 @@ PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
-RETRY_TIME = 6
+RETRY_TIME = 600
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 PAYLOAD = {'from_date': 0}
@@ -73,25 +74,28 @@ def get_api_answer(current_timestamp):
         logging.error('Превышено количество перенаправлений')
         return {}
 
-
 def check_response(response):
+    # У меня уже закончились идеи, перечитал кучу материала, 
+    # если есть что-то именно по данному вопросу пришли пожалуйста.
     """Проверяет ответ API на корректность."""
     try:
         homework = response['homeworks']
         key = 'homeworks'
-        if not key:
-            logger.error("Ключа homeworks нет в словаре.")
-            raise KeyError("Ключа homeworks нет в словаре!")
-        if type(homework) is not list:
-            raise TypeHomeworkError("Некоректный формат списка!")
-        if not homework:
-            raise ListHomeworkEmptyError("Список работ пуст!")
-        return homework
+    except KeyError:
+        logger.error("Ключа homeworks нет в словаре.")
     except TypeHomeworkError:
         logger.error("Некоректный формат списка.")
     except ListHomeworkEmptyError:
-        logger.error("Список работ пуст.")
-        return {}
+        logger.error("Список работ пуст.") 
+     
+    if key not in response:
+        raise KeyError("Ключа homeworks нет в словаре!")
+    if type(homework) is not list:
+        raise TypeHomeworkError("Некоректный формат списка!")
+    if not homework:
+        raise ListHomeworkEmptyError("Список работ пуст!")
+    else:
+        return homework   
 
 
 def parse_status(homework):
@@ -102,9 +106,9 @@ def parse_status(homework):
         verdict = HOMEWORK_STATUSES[homework_status]
         key = 'homework_name'
         key_st = 'status'
-        if not key_st or len(key_st) == 0:
+        if key_st not in homework:
             raise HomeworkStatusError(f"Ошибка с ключем {key_st} в словаре!")
-        if not key or len(key) == 0:
+        if key not in homework:
             raise HomeworkStatusError(f"Ошибка с ключем {key} в словаре!")
         if homework_name is None:
             raise HomeworkNameError("Нет названия домашней работы!")
