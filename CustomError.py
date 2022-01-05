@@ -10,7 +10,25 @@ class HomeworkVerdictError(Error):
     pass
 
 
+class HomeworkNameError(Error):
+    """HomeworkNameError exceptions."""
+
+    pass
+
+
+class TypeHomeworkError(Error):
+    """TypeHomeworkError exceptions."""
+
+    pass
+
+
 class ListHomeworkEmptyError(Error):
     """ListHomeworkEmptyError exceptions."""
+
+    pass
+
+
+class HomeworkStatusError(Error):
+    """HomeworkStatusError exceptions."""
 
     pass
