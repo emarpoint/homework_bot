@@ -75,20 +75,18 @@ def get_api_answer(current_timestamp):
 
 
 def check_response(response):
-    # У меня уже закончились идеи, перечитал кучу материала,
-    # если есть что-то именно по данному вопросу пришли пожалуйста.
     """Проверяет ответ API на корректность."""
     try:
         homework = response['homeworks']
-        key = 'homeworks'
     except KeyError:
         logger.error("Ключа homeworks нет в словаре.")
+        raise SystemExit
     except TypeHomeworkError:
         logger.error("Некоректный формат списка.")
+        raise SystemExit
     except ListHomeworkEmptyError:
         logger.error("Список работ пуст.")
-    if key not in response:
-        raise KeyError("Ключа homeworks нет в словаре!")
+        raise SystemExit
     if type(homework) is not list:
         raise TypeHomeworkError("Некоректный формат списка!")
     if not homework:
@@ -103,12 +101,6 @@ def parse_status(homework):
         homework_name = homework['homework_name']
         homework_status = homework['status']
         verdict = HOMEWORK_STATUSES[homework_status]
-        key = 'homework_name'
-        key_st = 'status'
-        if key_st not in homework:
-            raise HomeworkStatusError(f"Ошибка с ключем {key_st} в словаре!")
-        if key not in homework:
-            raise HomeworkStatusError(f"Ошибка с ключем {key} в словаре!")
         if homework_name is None:
             raise HomeworkNameError("Нет названия домашней работы!")
         if verdict is None:
