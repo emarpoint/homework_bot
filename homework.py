@@ -26,7 +26,7 @@ PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
-RETRY_TIME = 600
+RETRY_TIME = 6
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 PAYLOAD = {'from_date': 0}
@@ -77,7 +77,9 @@ def get_api_answer(current_timestamp):
 def check_response(response):
     """Проверяет ответ API на корректность."""
     try:
-        homework = response['homeworks']
+        homework = response['homeworks'] 
+        if response['homeworks'] == []:
+            return{}      
     except KeyError:
         logger.error("Ключа homeworks нет в словаре.")
         raise SystemExit
@@ -152,8 +154,7 @@ def main():
             message = f'Произошла ошибка программы: {error}'
             send_message(message, bot)
             time.sleep(RETRY_TIME)
-    message = 'Произошла ошибка в check_tokens'
-    send_message(message, bot)
+
 
 
 if __name__ == '__main__':
