@@ -4,24 +4,6 @@ class Error(Exception):
     pass
 
 
-class HomeworkNameError(Error):
-    """HomeworkNameError exceptions."""
-
-    pass
-
-
-class HomeworkStatusError(Error):
-    """HomeworkStatusError exceptions."""
-
-    pass
-
-
-class HomeworkVerdictError(Error):
-    """HomeworkVerdictError exceptions."""
-
-    pass
-
-
 class TypeHomeworkError(Error):
     """TypeHomeworkError exceptions."""
 

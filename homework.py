@@ -11,8 +11,7 @@ import time
 from requests.exceptions import (ConnectionError,
                                  RequestException, TooManyRedirects)
 from telegram import TelegramError
-from CustomError import (HomeworkNameError, HomeworkStatusError,
-                         TypeHomeworkError, ListHomeworkEmptyError,
+from CustomError import (ListHomeworkEmptyError,
                          HomeworkVerdictError)
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -76,44 +75,54 @@ def get_api_answer(current_timestamp):
 
 def check_response(response):
     """Проверяет ответ API на корректность."""
-    homework = response['homeworks']
-    key = 'homeworks'
-    if key in homework is None:
-        logger.error("Ключа homeworks нет в словаре.")
-        raise KeyError("Ключа homeworks нет в словаре!")
-    if type(homework) is not list:
-        logger.error("Некоректный формат списка.")
-        raise TypeHomeworkError("Некоректный формат списка!")
-    if not homework:
-        logger.error("Список работ пуст.")
-        raise ListHomeworkEmptyError("Список работ пуст!")
+    if not isinstance(response, dict):
+        message = 'Ответ не является словарем!'
+        logger.error(message)
+        raise TypeError(message)
+
+    elif 'homeworks' not in response:
+        message = 'Ключа homeworks нет в словаре.'
+        logger.error(message)
+        raise KeyError(message)
+
+    elif not isinstance(response['homeworks'], list):
+        message = 'Домашние работы не являются списком!'
+        logger.error(message)
+        raise TypeError(message)
+
+    elif not response['homeworks']:
+        message = 'Список работ пуст!'
+        logger.error(message)
+        raise ListHomeworkEmptyError(message)
+
     else:
-        return homework
+        return response['homeworks']
 
 
 def parse_status(homework):
     """Достаем статус работы."""
-    try:
+    if not isinstance(homework, dict):
+        message = 'Ответ не является словарем!'
+        logger.error(message)
+        raise TypeError(message)
+    elif 'homework_name' not in homework:
+        message = 'Ключа homework_name нет в словаре.'
+        logger.error(message)
+        raise KeyError(message)
+    elif 'status' not in homework:
+        message = 'Ключа status нет в словаре.'
+        logger.error(message)
+        raise KeyError(message)
+    elif HOMEWORK_STATUSES[homework['status']] is None:
+        message = "Нет вердикта."
+        logger.error(message)
+        raise HomeworkVerdictError("Нет вердикта!")
+    else:
         homework_name = homework['homework_name']
         homework_status = homework['status']
         verdict = HOMEWORK_STATUSES[homework_status]
-        key = 'homework_name'
-        key_st = 'status'
-        if key_st in homework_status is None or len(key_st) == 0:
-            raise HomeworkStatusError("Ошибка с ключем в словаре!")
-        if key in homework_name is None:
-            raise HomeworkNameError("Произошла ошибка!")
-        if verdict is None:
-            raise HomeworkVerdictError("Нет вердикта!")
-    except HomeworkStatusError:
-        logging.error(f'Ошибка с ключем в словаре {HOMEWORK_STATUSES}')
-    except HomeworkNameError:
-        logging.error("Произошла ошибка.")
-    except HomeworkVerdictError:
-        logging.info(f'Вердикт {verdict}')
-    else:
-        return (f'Изменился статус проверки работы "{homework_name}".'
-                f'{verdict}')
+        return(f'Изменился статус проверки работы "{homework_name}".'
+               f'{verdict}')
 
 
 def check_tokens():
