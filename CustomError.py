@@ -4,8 +4,8 @@ class Error(Exception):
     pass
 
 
-class TypeHomeworkError(Error):
-    """TypeHomeworkError exceptions."""
+class HomeworkVerdictError(Error):
+    """HomeworkVerdictError exceptions."""
 
     pass
 
