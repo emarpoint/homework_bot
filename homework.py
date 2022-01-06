@@ -25,7 +25,7 @@ PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
-RETRY_TIME = 6
+RETRY_TIME = 600
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 PAYLOAD = {'from_date': 0}
@@ -94,31 +94,34 @@ def check_response(response):
         message = 'Список работ пуст!'
         logger.error(message)
         raise ListHomeworkEmptyError(message)
-
     else:
         return response['homeworks']
 
 
 def parse_status(homework):
     """Достаем статус работы."""
-    try:
+    if not isinstance(homework, dict):
+        message = 'Ответ не является словарем!'
+        logger.error(message)
+        raise TypeError(message)
+    if 'homework_name' not in homework:
+        message = 'Ключа homework_name нет в словаре.'
+        logger.error(message)
+        raise KeyError(message)
+    if 'status' not in homework:
+        message = 'Ключа status нет в словаре.'
+        logger.error(message)
+        raise KeyError(message)
+    if HOMEWORK_STATUSES[homework['status']] is None:
+        message = "Нет вердикта."
+        logger.error(message)
+        raise HomeworkVerdictError("Нет вердикта!")
+    else:
         homework_name = homework['homework_name']
         homework_status = homework['status']
         verdict = HOMEWORK_STATUSES[homework_status]
-    except KeyError:
-        logging.error(f'Ошибка с ключем в словаре {HOMEWORK_STATUSES}')
-    except HomeworkNameError:
-        logging.error("Произошла ошибка.")
-    except HomeworkVerdictError:
-        logging.info(f"Вердикт {HOMEWORK_STATUSES[homework['status']]}")
-    if homework['homework_name'] is None:
-        raise HomeworkNameError("Нет названия домашней работы!")
-    if verdict is None:
-        raise HomeworkVerdictError("Нет вердикта!")
-    else:
-        return (f'Изменился статус проверки работы "{homework_name}".'
-                f'{verdict}')
-
+        return(f'Изменился статус проверки работы "{homework_name}".'
+               f'{verdict}')
 
 def check_tokens():
     """Проверка доступности переменных окружения."""
