@@ -12,7 +12,7 @@ from requests.exceptions import (ConnectionError,
                                  RequestException, TooManyRedirects)
 from telegram import TelegramError
 from CustomError import (ListHomeworkEmptyError, HomeworkVerdictError,
-                        HomeworkNameError)
+                         HomeworkNameError)
 load_dotenv()
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -75,31 +75,6 @@ def get_api_answer(current_timestamp):
 
 def check_response(response):
     """Проверяет ответ API на корректность."""
-    try:
-        homework = response['homeworks']
-        if response['homeworks'] == []:
-            return{}
-    except KeyError:
-        logger.error("Ключа homeworks нет в словаре.")
-        raise SystemExit
-    except TypeError as e:
-        logger.error("Некоректный формат списка.")
-        raise SystemExit(e)
-    except ListHomeworkEmptyError:
-        logger.error("Список работ пуст.")
-        raise SystemExit
-    if not isinstance (response, dict):
-        raise TypeError("Некоректный формат словаря")
-    if type(response['homeworks']) is not list:
-        raise TypeError("Некоректный формат списка!")
-    if not homework:
-        raise ListHomeworkEmptyError("Список работ пуст!")
-    else:
-        return homework
-
-
-def check_response(response):
-    """Проверяет ответ API на корректность."""
     if not isinstance(response, dict):
         message = 'Ответ не является словарем!'
         logger.error(message)
@@ -124,14 +99,12 @@ def check_response(response):
         return response['homeworks']
 
 
-
 def parse_status(homework):
     """Достаем статус работы."""
     try:
         homework_name = homework['homework_name']
         homework_status = homework['status']
         verdict = HOMEWORK_STATUSES[homework_status]
-       
     except KeyError:
         logging.error(f'Ошибка с ключем в словаре {HOMEWORK_STATUSES}')
     except HomeworkNameError:
@@ -183,7 +156,6 @@ def main():
             message = f'Произошла ошибка программы: {error}'
             send_message(message, bot)
             time.sleep(RETRY_TIME)
-
 
 
 if __name__ == '__main__':
