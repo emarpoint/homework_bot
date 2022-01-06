@@ -11,8 +11,7 @@ import time
 from requests.exceptions import (ConnectionError,
                                  RequestException, TooManyRedirects)
 from telegram import TelegramError
-from CustomError import (ListHomeworkEmptyError, HomeworkVerdictError)
-                    
+from CustomError import (ListHomeworkEmptyError, HomeworkVerdictError)                   
 load_dotenv()
 logger = logging.getLogger(__name__)
 logging.basicConfig(
