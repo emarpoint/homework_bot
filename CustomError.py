@@ -16,11 +16,6 @@ class HomeworkNameError(Error):
     pass
 
 
-class TypeHomeworkError(Error):
-    """TypeHomeworkError exceptions."""
-
-    pass
-
 
 class ListHomeworkEmptyError(Error):
     """ListHomeworkEmptyError exceptions."""
@@ -28,7 +23,4 @@ class ListHomeworkEmptyError(Error):
     pass
 
 
-class HomeworkStatusError(Error):
-    """HomeworkStatusError exceptions."""
 
-    pass

@@ -12,8 +12,7 @@ from requests.exceptions import (ConnectionError,
                                  RequestException, TooManyRedirects)
 from telegram import TelegramError
 from CustomError import (ListHomeworkEmptyError, HomeworkVerdictError,
-                         TypeHomeworkError, HomeworkStatusError,
-                         HomeworkNameError)
+                        HomeworkNameError)
 load_dotenv()
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -77,24 +76,53 @@ def get_api_answer(current_timestamp):
 def check_response(response):
     """Проверяет ответ API на корректность."""
     try:
-        homework = response['homeworks'] 
+        homework = response['homeworks']
         if response['homeworks'] == []:
-            return{}      
+            return{}
     except KeyError:
         logger.error("Ключа homeworks нет в словаре.")
         raise SystemExit
-    except TypeHomeworkError:
+    except TypeError as e:
         logger.error("Некоректный формат списка.")
-        raise SystemExit
+        raise SystemExit(e)
     except ListHomeworkEmptyError:
         logger.error("Список работ пуст.")
         raise SystemExit
-    if type(homework) is not list:
-        raise TypeHomeworkError("Некоректный формат списка!")
+    if not isinstance (response, dict):
+        raise TypeError("Некоректный формат словаря")
+    if type(response['homeworks']) is not list:
+        raise TypeError("Некоректный формат списка!")
     if not homework:
         raise ListHomeworkEmptyError("Список работ пуст!")
     else:
         return homework
+
+
+def check_response(response):
+    """Проверяет ответ API на корректность."""
+    if not isinstance(response, dict):
+        message = 'Ответ не является словарем!'
+        logger.error(message)
+        raise TypeError(message)
+
+    if 'homeworks' not in response:
+        message = 'Ключа homeworks нет в словаре.'
+        logger.error(message)
+        raise KeyError(message)
+
+    if type(response['homeworks']) is not list:
+        message = 'Домашние работы не являются списком!'
+        logger.error(message)
+        raise TypeError(message)
+
+    if not response['homeworks']:
+        message = 'Список работ пуст!'
+        logger.error(message)
+        raise ListHomeworkEmptyError(message)
+
+    else:
+        return response['homeworks']
+
 
 
 def parse_status(homework):
@@ -103,16 +131,17 @@ def parse_status(homework):
         homework_name = homework['homework_name']
         homework_status = homework['status']
         verdict = HOMEWORK_STATUSES[homework_status]
-        if homework_name is None:
-            raise HomeworkNameError("Нет названия домашней работы!")
-        if verdict is None:
-            raise HomeworkVerdictError("Нет вердикта!")
-    except HomeworkStatusError:
+       
+    except KeyError:
         logging.error(f'Ошибка с ключем в словаре {HOMEWORK_STATUSES}')
     except HomeworkNameError:
         logging.error("Произошла ошибка.")
     except HomeworkVerdictError:
-        logging.info(f'Вердикт {verdict}')
+        logging.info(f"Вердикт {HOMEWORK_STATUSES[homework['status']]}")
+    if homework['homework_name'] is None:
+        raise HomeworkNameError("Нет названия домашней работы!")
+    if verdict is None:
+        raise HomeworkVerdictError("Нет вердикта!")
     else:
         return (f'Изменился статус проверки работы "{homework_name}".'
                 f'{verdict}')
