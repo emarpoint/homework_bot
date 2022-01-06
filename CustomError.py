@@ -10,12 +10,6 @@ class HomeworkVerdictError(Error):
     pass
 
 
-class HomeworkNameError(Error):
-    """HomeworkNameError exceptions."""
-
-    pass
-
-
 
 class ListHomeworkEmptyError(Error):
     """ListHomeworkEmptyError exceptions."""

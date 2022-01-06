@@ -11,8 +11,8 @@ import time
 from requests.exceptions import (ConnectionError,
                                  RequestException, TooManyRedirects)
 from telegram import TelegramError
-from CustomError import (ListHomeworkEmptyError, HomeworkVerdictError,
-                         HomeworkNameError)
+from CustomError import (ListHomeworkEmptyError, HomeworkVerdictError)
+                    
 load_dotenv()
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -122,6 +122,7 @@ def parse_status(homework):
         verdict = HOMEWORK_STATUSES[homework_status]
         return(f'Изменился статус проверки работы "{homework_name}".'
                f'{verdict}')
+
 
 def check_tokens():
     """Проверка доступности переменных окружения."""
